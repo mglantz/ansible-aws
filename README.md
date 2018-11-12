@@ -16,7 +16,7 @@ Playbooks expect file ```content/vars/vars.yml``` to contain settings your perso
 
 ## Encrypting credentials with Ansible Vault
 
-Put password of your choice into a text file. In this example ```content/vault-password.txt```. Then you can use command ```ansible-vault --vault-password-file content/vault-password.txt encrypt_string``` to encrypt your credentials. The output can be used in the ```content/vars/vars.yml``` file, see example in ```content/vars/vars-example.yml -file.
+Put password of your choice into a text file. In this example ```content/vault-password.txt```. Then you can use command ```ansible-vault --vault-password-file content/vault-password.txt encrypt_string``` to encrypt your credentials. The output can be used in the ```content/vars/vars.yml``` file, see example in ```content/vars/vars-example.yml```-file.
 
 You can also put the credentials in plain text, but you should make sure that you don't commit them into any git repository! Files ```content/vars/vars.yml``` and ```content/vault-password.txt``` are ignored by git in this repository for your safety.
 

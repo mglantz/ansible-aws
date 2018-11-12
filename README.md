@@ -27,5 +27,5 @@ You can also put the credentials in plain text, but you should make sure that yo
 Playbook ```provision-all.yml``` includes other playbooks to create all necessary resources into AWS, and configure each of them. It will use dynamic inventory provided by ```content/inventory/ec2.py```. That's why you need boto Python modules installed in addition to AWS credentials in ```content/vars/vars.yml```.
 
 ```
-ansible-playbook --vault-password-file vault-password.txt -i inventory/ec2.py provision-all.yml
+ansible-playbook --vault-password-file vault-password.txt -i inventory/ec2.py deploy-server.yml
 ```

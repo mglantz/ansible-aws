@@ -1,0 +1,69 @@
+- name: "[Play 1] Create VMs in Amazon EC2"
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - vars/vars.yml
+  tasks:
+      
+  - name: Ensure a security group for VMs servers is in place
+    ec2_group:
+      name: "{{ ec2_security_group_vms }}"
+      description: Security Group for my VMs servers
+      region: "{{ ec2_region }}"
+      aws_access_key: "{{ec2_access_key}}"
+      aws_secret_key: "{{ec2_secret_key}}"
+      rules:
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 443
+          to_port: 443
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 8080
+          to_port: 8080
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          cidr_ip: 0.0.0.0/0
+          
+  - name: Provision VMs on Amazon
+    ec2:
+      aws_access_key: "{{ec2_access_key}}"
+      aws_secret_key: "{{ec2_secret_key}}"
+      key_name: "{{ec2_key}}"
+      region: "{{ ec2_region }}"
+      group: "{{ ec2_security_group_vms }}"
+      instance_type: t2.micro
+      image: "{{ ami_id }}"
+      wait: true
+      exact_count: "{{ number_of_systems }}"
+      count_tag:
+        identity: myvms
+      instance_tags:
+       identity: myvms
+    register: ec2micro
+    
+  - name: Add VM instance public IPs to host group
+    add_host: hostname={{ item.public_ip }} groups=ec2micro
+    with_items: "{{ ec2micro.tagged_instances }}"
+
+  - name: Print IP address of VMs
+    debug:
+      msg: "{{ groups['ec2micro'] }}"
+
+  - name: Wait for SSH to come up
+    wait_for:
+      host: "{{ item.public_ip }}"
+      port: 22
+      delay: 30
+      timeout: 120
+      state: started
+    with_items: "{{ ec2micro.tagged_instances }}"
